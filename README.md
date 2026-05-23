@@ -79,23 +79,23 @@ GET /api/content?type=article&author=John
 
 ---
 
+## Authors
+
+GET /api/authors/{id}  
+POST /api/authors  
+
+---
+
 ## Public Content API
 
 GET /{content_type}/{slug}
 
 Example:
-GET /blog/my-first-post
+GET /blog_post/my-first-post
 
 Returns only:
 - published
 - not deleted
-
----
-
-## Authors
-
-GET /api/authors/{id}  
-POST /api/authors  
 
 ---
 
@@ -183,6 +183,7 @@ GET http://localhost:8000/api/content?type=article
 - Unit testing
 - Improved slug performance
 - Stronger separation between public/admin APIs
+- Add caching for frequently requested content to improve performance and reduce database load
 
 ---
 

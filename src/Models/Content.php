@@ -52,7 +52,7 @@ class Content {
     }
 
     public function getById($id) {
-        $sql = "SELECT * FROM {$this->table} join authors on authors.id = content.author_id join content_type on content_type.id = content.type_id WHERE content.id = :id";
+        $sql = "SELECT content.*, authors.name, content_type.type FROM {$this->table} join authors on authors.id = content.author_id join content_type on content_type.id = content.type_id WHERE content.id = :id";
         return $this->db->fetchOne($sql, [':id' => $id]);
     }
 

@@ -1,0 +1,8 @@
+.idea/
+vendor/
+.env
+*.log
+.DS_Store
+Thumbs.db
+postman/
+.postman/

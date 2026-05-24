@@ -184,6 +184,7 @@ GET http://localhost:8000/api/content?type=article
 - Improved slug performance
 - Stronger separation between public/admin APIs
 - Add caching for frequently requested content to improve performance and reduce database load
+- -Add suport for Photos
 
 ---
 

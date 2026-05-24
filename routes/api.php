@@ -28,10 +28,10 @@ $router['GET']['/api/content/(\d+)'] = function($matches) {
     $content = new Content(Database::getInstance());
     $result = $content->getById($matches[0]); //also returns deleted and unpublished
     
-    if ($result) {
-        jsonResponse($result);
+    if ($result['success']==1) {
+        jsonResponse($result["result"]);
     } else {
-        jsonResponse(['error' => 'Content not found'], 404);
+        jsonResponse($result["error"], 404);
     }
 };
 

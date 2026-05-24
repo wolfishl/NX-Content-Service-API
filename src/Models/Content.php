@@ -52,8 +52,14 @@ class Content {
     }
 
     public function getById($id) {
-        $sql = "SELECT content.*, authors.name, content_type.type FROM {$this->table} join authors on authors.id = content.author_id join content_type on content_type.id = content.type_id WHERE content.id = :id";
-        return $this->db->fetchOne($sql, [':id' => $id]);
+        $sql = "SELECT content.*, authors.name FROM {$this->table} join authors on authors.id = content.author_id WHERE content.id = :id";
+        $result = $this->db->fetchOne($sql, [':id' => $id]);
+		if (!empty($result))
+		{
+			$result['type'] = $this->getTypeName($result['type_id']);
+			return ['success'=>1, 'result'=>$result];
+		}
+		return ['success'=>0, 'error'=>'Content not found'];
     }
 
 	private function isTypeValid($type)
@@ -66,6 +72,10 @@ class Content {
 		}
 
 		return false;
+	}
+
+	private function getTypeName($type_id){
+		return $this->content_types[$type_id]['type'];
 	}
 
 	private function getContentTypes() {

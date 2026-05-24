@@ -318,20 +318,6 @@ class Content {
 		return $updated ? ['success'=> 1] : ["success"=>0, 'error'=>'Failed to publish content'];
 	}
 
-	public function addAuthor($data){
-		if (!isset($data['name']) || !isset($data['email'])){
-			return ['success'=>0, 'error' => 'Missing required fields: name, email'];
-		}
-		$sql = "INSERT INTO authors (name, email) VALUES (:name, :email)";
-		$this->db->execute($sql, [':name' => $data['name'], ':email' => $data['email']]);
-		$id = $this->db->lastInsertId();
-		return ['success'=> 1, 'id'=>$id];
-	}
-
-	public function getAuthor($id) {
-		$sql = "SELECT * FROM authors WHERE id = :id";
-		return $this->db->fetchOne($sql, [':id' => $id]);
-	}
 
 	public function getBySlug($type, $slug) {
 		$type_id = $this->isTypeValid($type);

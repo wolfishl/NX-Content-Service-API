@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../src/Models/Content.php';
+require_once __DIR__ . '/../src/Models/Author.php';
 
 $router = [
     'GET' => [],
@@ -117,8 +118,8 @@ $router['DELETE']['/api/content/(\d+)'] = function($matches) {
 
 // GET /api/authors/{id} - Get author
 $router['GET']['/api/authors/(\d+)'] = function($matches) {
-	$content = new Content(Database::getInstance());
-	$result = $content->getAuthor($matches[0]);
+	$author = new Author(Database::getInstance());
+	$result = $author->getAuthor($matches[0]);
 
 	if ($result) {
 		jsonResponse($result);
@@ -136,8 +137,8 @@ $router['POST']['/api/authors'] = function() {
 		return;
 	}
 
-	$content = new Content(Database::getInstance());
-	$response = $content->addAuthor($data);
+	$author = new Author(Database::getInstance());
+	$response = $author->addAuthor($data);
 
 	if ($response['success'] == 1) {
 		jsonResponse(['message' => 'Author created', 'id' => $response['id']], 201);

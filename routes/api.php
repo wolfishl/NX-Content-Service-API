@@ -10,6 +10,8 @@ $router = [
     'DELETE' => []
 ];
 
+//TODO MAKE SURE ALL RESPONSES ARE IN THE SAME FORMAT!!!
+
 // GET /api/content - Get all contents
 $router['GET']['/api/content'] = function() {
     $content = new Content(Database::getInstance());
@@ -19,8 +21,8 @@ $router['GET']['/api/content'] = function() {
     $contractor = isset($_GET['contractor']) ? $_GET['contractor'] : null;
 
     
-    $results = $content->getAll($type, $author, $industry, $contractor); //only returns not deleted content (includes unpublished
-    jsonResponse($results);
+    $results = $content->getAll($type, $author, $industry, $contractor); //only returns not deleted content (includes unpublished)
+    $results['success']== 1 ? jsonResponse($results['results']) : jsonResponse($results['error'], 404);
 };
 
 // GET /api/contents/{id} - Get content by ID
@@ -40,7 +42,7 @@ $router['POST']['/api/content'] = function() {
     $data = json_decode(file_get_contents('php://input'), true);
     
     if (!$data || !isset($data['type']) || !isset($data['author']) || !isset($data['body']) || !isset($data['title'])) {
-        jsonResponse(['error' => 'Missing required fields: type, author, body, title'], 400);
+        jsonResponse('Missing required fields: type, author, body, title', 400);
         return;
     }
     
@@ -66,7 +68,7 @@ $router['PUT']['/api/content/(\d+)'] = function($matches) {
     $content = new Content(Database::getInstance());
     $result = $content->getById($matches[0]);
     
-    if (!$result) {
+    if ($result["success"] != 1) {
         jsonResponse(['error' => 'Content not found'], 404);
         return;
     }
@@ -84,7 +86,7 @@ $router['PUT']['/api/content/(\d+)'] = function($matches) {
 $router['PUT']['/api/content/(\d+)/publish'] = function($matches) {
 	$content = new Content(Database::getInstance());
 	$existing = $content->getById($matches[0]);
-	if (!$existing) {
+	if ($existing["success"] != 1) {
 		jsonResponse(['error' => 'Content not found'], 404);
 		return;
 	}
@@ -102,14 +104,14 @@ $router['DELETE']['/api/content/(\d+)'] = function($matches) {
     $content = new Content(Database::getInstance());
     $result = $content->getById($matches[0]);
     
-    if (!$result) {
+    if ($result["success"] != 1) {
         jsonResponse(['error' => 'Content not found'], 404);
         return;
     }
     
     $deleted = $content->delete($matches[0]);
     
-    if ($deleted) {
+    if ($deleted["success"] == 1) {
         jsonResponse(['message' => 'Content deleted']);
     } else {
         jsonResponse(['error' => 'Failed to delete content'], 500);
@@ -121,7 +123,7 @@ $router['GET']['/api/authors/(\d+)'] = function($matches) {
 	$author = new Author(Database::getInstance());
 	$result = $author->getAuthor($matches[0]);
 
-	if ($result) {
+	if ($result["success"] == 1) {
 		jsonResponse($result);
 	} else {
 		jsonResponse(['error' => 'Author not found'], 404);

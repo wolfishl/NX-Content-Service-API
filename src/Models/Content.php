@@ -6,6 +6,10 @@ class Content {
     protected $db;
     protected $table = 'content';
 	protected $content_types;
+	private const BLOG_POST = 1;
+	private const ARTICLE = 2;
+	private const EXPERIENCE = 3;
+	private const COST_GUIDE = 4;
 
     public function __construct($db) {
         $this->db = $db;
@@ -48,7 +52,8 @@ class Content {
 		$sql .= $conditions;
         $sql .= " ORDER BY date_edited DESC";
 
-		return $this->db->fetchAll($sql, $params);
+		$results = $this->db->fetchAll($sql, $params);
+		return isset($results) ? ['success'=>1, 'results'=>$results] : ['success'=>0, 'error'=>'No content found'];
     }
 
     public function getById($id) {
@@ -145,19 +150,19 @@ class Content {
 	private function validateTypeConditions($type_id, $data, $old_data=null)
 	{
 		switch ($type_id) {
-			case 1: //blog_post
+			case self::BLOG_POST:
 				if (!isset($data['industry']) && !isset($old_data['industry'])) {
 					return ['success' => 0, 'error' => 'Blog post must have industry'];
 				}
 				break;
-			case 2: //article - no additional requirements
+			case self::ARTICLE: //no additional requirements
 				break;
-			case 3: //experience
+			case self::EXPERIENCE:
 				if (!isset($data['contractor']) && !isset($old_data['contractor'])) {
 					return ['success' => 0, 'error' => 'Experience must have contractor'];
 				}
 				break;
-			case 4: //cost_guide
+			case self::COST_GUIDE:
 				if ((!isset($data['min_cost']) || !isset($data['max_cost'])) && (!isset($old_data['min_cost']) || !isset($old_data['max_cost']) )) {
 					return ['success' => 0, 'error' => 'Cost guide must have min_cost and max_cost'];
 				}
@@ -243,7 +248,7 @@ class Content {
         $params = [
             ':type_id' => $type,
             ':author_id' => $author,
-			'title' => $data['title'],
+			':title' => $data['title'],
             ':body' => $data['body'],
             ':industry_id' => $data['industry_id'],
             ':contractor_id' => $data['contractor_id'],
@@ -252,9 +257,9 @@ class Content {
 			':slug' => $slug
         ];
 
-        $this->db->execute($sql, $params);
+        $this->db->execute($sql, $params); //TODO try/catch
         $id = $this->db->lastInsertId();
-		$this->updateSlugHistory($id, $slug, $type);
+		$this->updateSlugHistory($id, $slug, $type); //TODO try/catch
 		return ['success'=> 1, 'id'=>$id];
     }
 
@@ -309,7 +314,7 @@ class Content {
         $fields[] = "date_edited = NOW()";
 
         $sql = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
-        $updated = $this->db->execute($sql, $params);
+        $updated = $this->db->execute($sql, $params); //TODO try/catch
 		if ($updated) {
 			if (isset($data['slug'])) $this->updateSlugHistory($id, $data['slug'], $type_id);
 			return ['success'=> 1];
@@ -319,12 +324,13 @@ class Content {
 
     public function delete($id) {
         $sql = "UPDATE {$this->table} SET date_deleted =  now() WHERE id = :id";
-        return $this->db->execute($sql, [':id' => $id]);
+        $deleted = $this->db->execute($sql, [':id' => $id]); //TODO try/catch
+		return $deleted ? ['success'=> 1] : ["success"=>0, 'error'=>'Failed to delete content'];
     }
 
 	public function publish($id) {
 		$sql = "UPDATE {$this->table} SET date_published = NOW() WHERE id = :id";
-		$updated = $this->db->execute($sql, [':id' => $id]);
+		$updated = $this->db->execute($sql, [':id' => $id]); //TODO try/catch
 		return $updated ? ['success'=> 1] : ["success"=>0, 'error'=>'Failed to publish content'];
 	}
 

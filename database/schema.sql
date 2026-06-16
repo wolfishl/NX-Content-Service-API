@@ -14,7 +14,7 @@ create table content_service.authors
 
 create table content_service.content_type
 (
-    id   int auto_increment
+    id   int
         primary key,
     type varchar(20) not null
 );

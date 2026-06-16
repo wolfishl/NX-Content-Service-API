@@ -25,6 +25,7 @@ class Author
 
 	public function getAuthor($id) {
 		$sql = "SELECT * FROM {$this->table} WHERE id = :id";
-		return $this->db->fetchOne($sql, [':id' => $id]);
+		$author = $this->db->fetchOne($sql, [':id' => $id]);
+		return isset($author) ? ['success'=>1, 'author'=>$author] : ['success'=>0, 'error'=>'Author not found'];
 	}
 }
